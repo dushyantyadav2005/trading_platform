@@ -1,13 +1,13 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 function Navbar() {
   return (
     <div className="container">
       <nav class="navbar navbar-expand-lg border-bottom" style={{backgroundColor:"#fff"}}>
         <div class="container p-2">
-          <a class="navbar-brand" href="#k">
+          <Link class="navbar-brand" to={"/"}>
             <img src="media/images/logo.svg" style={{width:"25%"}} alt=""/>
-          </a>
+          </Link>
           <button
             class="navbar-toggler"
             type="button"
@@ -24,29 +24,29 @@ function Navbar() {
             <form class="d-flex" role="search">
             <ul class="navbar-nav  mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#c">
+                <Link class="nav-link active" aria-current="page" to="/signup">
                   Signup
-                </a>
+                </Link>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="#v">
+                <Link class="nav-link active" aria-current="page" to="/about">
                   About
-                </a>
+                </Link>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="#b">
+                <Link class="nav-link active" aria-current="page" to="/product">
                   Product
-                </a>
+                </Link>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="#a">
+                <Link class="nav-link active" aria-current="page" to="/price">
                   Pricing
-                </a>
+                </Link>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="#l">
+                <Link class="nav-link active" aria-current="page" to="/support">
                   Support
-                </a>
+                </Link>
               </li>
              
             </ul>

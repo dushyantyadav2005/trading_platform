@@ -5,7 +5,7 @@ import Hero from './Hero';
 function SupportPage() {
     return ( <>
     <Hero/>
-    <SupportPage/>
+    {/* <SupportPage/> */}
     </> );
 }
 
