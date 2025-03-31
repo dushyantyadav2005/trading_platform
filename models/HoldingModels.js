@@ -1,9 +1,9 @@
 const {model}=require("mongoose");
 
 
-const {HoldingsSchema}=require("../schemas/HoldingsSchema");
+const {HoldingsSchema}=require("../schemas/HoldingSchema");
 
 const HoldingsModel = new model("holding", HoldingsSchema);
 
 
-model.exports={HoldingsModel};
+module.exports={HoldingsModel};
