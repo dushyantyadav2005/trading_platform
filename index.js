@@ -5,10 +5,16 @@ const mongoose=require("mongoose");
 const {HoldingsModel}=require("./models/HoldingModels");
 const {PositionModel}=require("./models/PositionModels");
 const {OrderModels}=require("./models/OrderModels");
-
+const {Signup, Login}=require("./Controllers/AuthController")
+const {userVerification}=require("./Middlewares/AuthMiddleware")
 const bodyParser=require("body-parser");
+const cookieParser = require("cookie-parser");
+const app=express();
 
 const cors=require("cors");
+app.use(bodyParser.json()); // Parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(cookieParser());
 
 const PORT=process.env.PORT||3002;
 const uri = process.env.MONGO_URL;
@@ -16,10 +22,24 @@ console.log(uri);
 
 
 
-const app=express();
 
-app.use(cors());
-app.use(bodyParser.json());
+
+
+
+
+// Enhanced CORS configuration
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Explicitly handle OPTIONS requests
+app.options('*', cors(corsOptions));
 
 // app.get("/addholding",async(req,res)=>{
 //    let tempobj=[
@@ -197,6 +217,11 @@ app.get("/allpositions",async(req,res)=>{
     res.json(allpositions);
 });
 
+app.get("/allorderes",async(req,res)=>{
+    let allorderes=await OrderModels.find({});
+    res.json(allorderes);
+});
+
 app.post("/neworder",async(req,res)=>{
     let neworder=new OrderModels({
         name: req.body.name,
@@ -217,6 +242,11 @@ app.post("/sellOrder",async(req,res)=>{
     neworder.save();
     res.send("order done!");
 })
+
+
+app.post("/signup",Signup);
+app.post("/login",Login);
+app.post('/',userVerification);
 
 app.listen(PORT,()=>{
   console.log("app started");
