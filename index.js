@@ -27,13 +27,13 @@ console.log(uri);
 
 
 
-// Enhanced CORS configuration
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
+let corsOptions = {
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  };
+  
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
