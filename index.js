@@ -18,9 +18,7 @@ app.use(cookieParser());
 
 const PORT=process.env.PORT||3002;
 const uri = process.env.MONGO_URL;
-console.log(uri);
-
-
+// console.log(uri);
 
 
 
@@ -28,7 +26,7 @@ console.log(uri);
 
 
 let corsOptions = {
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: ["https://dashboard-trading-platform-1.onrender.com", "https://fronttrading-platform-1.onrender.com"],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
