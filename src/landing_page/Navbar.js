@@ -12,6 +12,8 @@ function Navbar() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
 
+
+  const url="https://dashboard-trading-platform-1.onrender.com"
   useEffect(() => {
     const verifyCookie = async () => {
       if (!cookies.token) {
@@ -22,7 +24,7 @@ function Navbar() {
       
       try {
         const { data } = await axios.post(
-          "http://localhost:3002",
+          "https://trading-platform-66r4.onrender.com/",
           {},
           { withCredentials: true }
         );
@@ -152,6 +154,9 @@ function Navbar() {
                       <Link className="dropdown-item" to="/profile">
                         <i className="bi bi-person me-2"></i>Profile
                       </Link>
+                    <a className="dropdown-item" href={url}>
+                        <i className="bi bi-person me-2"></i>Dashboard
+                      </a>
                       <Link className="dropdown-item" to="/settings">
                         <i className="bi bi-gear me-2"></i>Settings
                       </Link>
