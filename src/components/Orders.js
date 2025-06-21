@@ -6,7 +6,7 @@ const Orders = () => {
    let [orders,setorderes]=useState([]);
 
    useEffect(()=>{
-     axios.get("http://localhost:3002/allorderes").then((res)=>{
+     axios.get("https://trading-platform-66r4.onrender.com/allorderes").then((res)=>{
       setorderes(res.data);
      });
    },[]);
