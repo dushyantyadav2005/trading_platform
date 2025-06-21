@@ -6,58 +6,131 @@ import { ToastContainer, toast } from "react-toastify";
 
 function Navbar() {
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies(["token"]);
+  const [cookies, , removeCookie] = useCookies(["token"]);
   const [username, setUsername] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
-
-
-  const url="https://dashboard-trading-platform-1.onrender.com"
+  
+  const url = "https://dashboard-trading-platform-1.onrender.com";
+  
+  // Check authentication status
   useEffect(() => {
-    const verifyCookie = async () => {
-      if (!cookies.token) {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        return;
-      }
-      
+    const verifyAuth = async () => {
       try {
         const { data } = await axios.post(
-          "https://trading-platform-66r4.onrender.com",
+          "https://trading-platform-66r4.onrender.com/verify",
           {},
-          { withCredentials: true }
+          { 
+            withCredentials: true,
+            headers: { 'Content-Type': 'application/json' }
+          }
         );
-        console.log(data);
-        const { status, user } = data;
-        if (status) {
-          setUsername(user);
+        
+        if (data.status) {
+          setUsername(data.user);
           setIsAuthenticated(true);
-          toast(`Welcome back, ${user}`, { 
-            position: "top-right",
-            className: 'toast-success'
-          });
+          // Save to localStorage for state persistence
+          localStorage.setItem("authState", JSON.stringify({
+            isAuthenticated: true,
+            username: data.user
+          }));
         } else {
-          throw new Error("Invalid token");
+          setIsAuthenticated(false);
+          localStorage.removeItem("authState");
         }
       } catch (error) {
-        console.error("Authentication error:", error);
-        removeCookie("token");
+        console.error("Auth check failed:", error);
         setIsAuthenticated(false);
-        navigate("/login");
+        localStorage.removeItem("authState");
       } finally {
         setIsLoading(false);
       }
     };
-    verifyCookie();
-  }, [cookies.token, navigate, removeCookie]);
 
-  const handleLogout = () => {
-    removeCookie("token", { path: "/" });
+    // Check localStorage for existing auth state
+    const savedAuthState = localStorage.getItem("authState");
+    if (savedAuthState) {
+      const { isAuthenticated: savedAuth, username: savedUsername } = JSON.parse(savedAuthState);
+      setIsAuthenticated(savedAuth);
+      setUsername(savedUsername);
+      setIsLoading(false);
+    } else {
+      verifyAuth();
+    }
+    
+    // Listen for storage events (cross-tab sync)
+    const handleStorageChange = (e) => {
+      if (e.key === "authState") {
+        if (e.newValue) {
+          const { isAuthenticated: newAuth, username: newUser } = JSON.parse(e.newValue);
+          setIsAuthenticated(newAuth);
+          setUsername(newUser);
+        } else {
+          setIsAuthenticated(false);
+          setUsername("");
+        }
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    try {
+      // Call backend logout
+      await axios.post(
+        "https://trading-platform-66r4.onrender.com/logout",
+        {},
+        { withCredentials: true }
+      );
+      
+      // Clear cookie with proper domain
+      const domain = window.location.hostname.includes('onrender.com') 
+        ? '.onrender.com' 
+        : 'localhost';
+      
+      removeCookie("token", { 
+        path: "/",
+        domain: domain
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    
+    // Update state and clear localStorage
     setIsAuthenticated(false);
-    navigate("/");
+    setUsername("");
+    localStorage.removeItem("authState");
+    
+    // Broadcast logout to other tabs
+    window.localStorage.setItem("logout", Date.now().toString());
+    
+    navigate("/login");
     toast.success("Logged out successfully", { position: "top-right" });
   };
+
+  // Handle cross-tab logout
+  useEffect(() => {
+    const handleLogoutEvent = (e) => {
+      if (e.key === "logout") {
+        setIsAuthenticated(false);
+        setUsername("");
+        localStorage.removeItem("authState");
+        navigate("/login");
+      }
+    };
+    
+    window.addEventListener("storage", handleLogoutEvent);
+    
+    return () => {
+      window.removeEventListener("storage", handleLogoutEvent);
+    };
+  }, [navigate]);
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
@@ -155,8 +228,8 @@ function Navbar() {
                       <Link className="dropdown-item" to="/profile">
                         <i className="bi bi-person me-2"></i>Profile
                       </Link>
-                    <a className="dropdown-item" href={url}>
-                        <i className="bi bi-person me-2"></i>Dashboard
+                      <a className="dropdown-item" href={url}>
+                        <i className="bi bi-speedometer2 me-2"></i>Dashboard
                       </a>
                       <Link className="dropdown-item" to="/settings">
                         <i className="bi bi-gear me-2"></i>Settings
