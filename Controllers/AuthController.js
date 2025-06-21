@@ -5,26 +5,26 @@ const bcrypt = require("bcryptjs");
 module.exports.Signup = async (req, res) => {
   try {
     const { email, password, username, createdAt } = req.body;
-
     const existingUser = await User.findOne({ email });
+    
     if (existingUser) {
       return res.json({ success: false, message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await User.create({
-      email,
-      password: hashedPassword,
-      username,
-      createdAt,
-    });
-
+    const user = await User.create({ email, password: hashedPassword, username, createdAt });
     const token = createSecretToken(user._id);
 
+    // Set cookie with domain for cross-subdomain access
+    const domain = process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost';
+    
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "None",
-      secure: true, // ⚠️ HTTPS required in production
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      domain: domain,
+      path: '/',
+      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
     });
 
     return res.status(201).json({
@@ -41,7 +41,6 @@ module.exports.Signup = async (req, res) => {
 module.exports.Login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.json({ success: false, message: "All fields are required" });
     }
@@ -57,11 +56,15 @@ module.exports.Login = async (req, res) => {
     }
 
     const token = createSecretToken(user._id);
+    const domain = process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost';
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "None",
-      secure: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+      domain: domain,
+      path: '/',
+      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
     });
 
     return res.status(201).json({
