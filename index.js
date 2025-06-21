@@ -26,7 +26,7 @@ const uri = process.env.MONGO_URL;
 
 
 let corsOptions = {
-    origin: ["https://dashboard-trading-platform-1.onrender.com", "https://fronttrading-platform-1.onrender.com"],
+    origin: ["https://dashboard-trading-platform-1.onrender.com", "http://localhost:3000"],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
