@@ -36,8 +36,28 @@ let corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
-// ... your routes (allholdings, allpositions, etc) ...
+app.get("/allHoldings", async (req, res) => {
+  let allHoldings = await HoldingsModel.find({});
+  res.json(allHoldings);
+});
 
+app.get("/allPositions", async (req, res) => {
+  let allPositions = await PositionModel.find({});
+  res.json(allPositions);
+});
+
+app.post("/newOrder", async (req, res) => {
+  let newOrder = new OrderModels({
+    name: req.body.name,
+    qty: req.body.qty,
+    price: req.body.price,
+    mode: req.body.mode,
+  });
+
+  newOrder.save();
+
+  res.send("Order saved!");
+});
 app.post("/signup", Signup);
 app.post("/login", Login);
 app.post('/verify', userVerification);
