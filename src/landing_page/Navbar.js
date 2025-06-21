@@ -24,10 +24,11 @@ function Navbar() {
       
       try {
         const { data } = await axios.post(
-          "https://trading-platform-66r4.onrender.com/",
+          "https://trading-platform-66r4.onrender.com",
           {},
           { withCredentials: true }
         );
+        console.log(data);
         const { status, user } = data;
         if (status) {
           setUsername(user);
